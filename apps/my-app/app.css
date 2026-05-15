@@ -1,0 +1,118 @@
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--vs-bg);
+}
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 40px;
+  padding: 0 10px;
+  flex-shrink: 0;
+  background: var(--vs-bg-soft);
+  border-bottom: 1px solid var(--vs-border);
+}
+
+.toolbar-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--vs-border-strong);
+  flex-shrink: 0;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+#editor-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 20px 24px;
+  gap: 8px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#note-title {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 0;
+  color: var(--vs-text);
+  outline: none;
+  width: 100%;
+}
+
+#note-title:focus {
+  border: none;
+  box-shadow: none;
+}
+
+#note-title::placeholder {
+  color: var(--vs-text-faint);
+}
+
+#note-body {
+  flex: 1;
+  outline: none;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--vs-text-muted);
+  min-height: 0;
+}
+
+#note-body:empty::before {
+  content: 'Start writing…';
+  color: var(--vs-text-faint);
+  pointer-events: none;
+}
+
+#empty-state {
+  display: none;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  color: var(--vs-text-faint);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.checklist-item label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checklist-item input[type='checkbox'] {
+  margin-top: 3px;
+  accent-color: var(--vs-accent);
+  flex-shrink: 0;
+}
+
+.checklist-item span {
+  flex: 1;
+  outline: none;
+  min-width: 0;
+}

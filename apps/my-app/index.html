@@ -3,13 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My App</title>
+  <title>Notes</title>
+  <link rel="stylesheet" href="vessel://sdk.css" />
+  <link rel="stylesheet" href="app.css" />
 </head>
 <body>
-  <script type="module">
-    import { ready } from '../../sdk/index.js'
-    await ready()
-    document.body.innerText = 'Hello, Vessel!'
-  </script>
+  <div id="app">
+    <div id="toolbar">
+      <button class="vs-btn vs-btn-soft vs-btn-sm" id="btn-new">+ New</button>
+      <div class="toolbar-sep"></div>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="bold"><b>B</b></button>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="italic"><i>I</i></button>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="underline"><u>U</u></button>
+      <div class="toolbar-sep"></div>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="insertUnorderedList">≡</button>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-checklist">☑</button>
+      <div class="toolbar-spacer"></div>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-delete">🗑</button>
+    </div>
+    <div id="editor-area">
+      <input id="note-title" class="vs-input" placeholder="Note title" autocomplete="off" />
+      <div id="note-body" contenteditable="true" spellcheck="true"></div>
+    </div>
+    <div id="empty-state">
+      No notes yet.<br>Click <b>+ New</b> to create one.
+    </div>
+  </div>
+  <script src="vessel://sdk.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
