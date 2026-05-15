@@ -11,15 +11,17 @@
   <div id="app">
     <div id="toolbar">
       <button class="vs-btn vs-btn-soft vs-btn-sm" id="btn-new">+ New</button>
-      <div class="toolbar-sep"></div>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="bold"><b>B</b></button>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="italic"><i>I</i></button>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="underline"><u>U</u></button>
-      <div class="toolbar-sep"></div>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="insertUnorderedList">≡</button>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-checklist">☑</button>
+      <div id="fmt-tools" style="display:contents">
+        <div class="toolbar-sep"></div>
+        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="bold"><b>B</b></button>
+        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="italic"><i>I</i></button>
+        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="underline"><u>U</u></button>
+        <div class="toolbar-sep"></div>
+        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="insertUnorderedList">≡</button>
+        <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-checklist">☑</button>
+      </div>
       <div class="toolbar-spacer"></div>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-delete">🗑</button>
+      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-delete" style="display:none">🗑</button>
     </div>
     <div id="editor-area">
       <input id="note-title" class="vs-input" placeholder="Note title" autocomplete="off" />

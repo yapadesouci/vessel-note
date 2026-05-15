@@ -4,6 +4,11 @@ export function htmlToMd(html) {
   return nodeToMd(div).trim()
 }
 
+function wrapLines(content, open, close) {
+  if (!content.includes('\n')) return `${open}${content}${close}`
+  return content.split('\n').map(l => l ? `${open}${l}${close}` : l).join('\n')
+}
+
 function nodeToMd(node) {
   if (node.nodeType === Node.TEXT_NODE) return node.textContent ?? ''
   if (node.nodeType !== Node.ELEMENT_NODE) return ''
@@ -11,9 +16,9 @@ function nodeToMd(node) {
   const tag = el.tagName.toLowerCase()
   const inner = () => Array.from(el.childNodes).map(nodeToMd).join('')
 
-  if (tag === 'strong' || tag === 'b') return `**${inner()}**`
-  if (tag === 'em' || tag === 'i') return `_${inner()}_`
-  if (tag === 'u') return `<u>${inner()}</u>`
+  if (tag === 'strong' || tag === 'b') return wrapLines(inner(), '**', '**')
+  if (tag === 'em' || tag === 'i') return wrapLines(inner(), '_', '_')
+  if (tag === 'u') return wrapLines(inner(), '<u>', '</u>')
   if (tag === 'br') return '\n'
   if (tag === 'ul') {
     return Array.from(el.querySelectorAll(':scope > li')).map(li => `- ${Array.from(li.childNodes).map(nodeToMd).join('').trim()}`).join('\n') + '\n'
@@ -28,7 +33,12 @@ function nodeToMd(node) {
     const text = span ? Array.from(span.childNodes).map(nodeToMd).join('').trim() : ''
     return `- [${checked}] ${text}\n`
   }
-  if (tag === 'div' || tag === 'p') return inner() + '\n'
+  // For block elements that contain block children (e.g. div wrapping a ul),
+  // avoid adding an extra trailing newline since children already produce their own.
+  if (tag === 'div' || tag === 'p') {
+    const content = inner()
+    return content.endsWith('\n') ? content : content + '\n'
+  }
   return inner()
 }
 
@@ -49,7 +59,7 @@ export function mdToHtml(md) {
       closeList()
       const text = applyInline((clDone || clTodo)[1])
       const checked = clDone ? ' checked' : ''
-      html += `<div class="checklist-item"><label><input type="checkbox"${checked}><span contenteditable>${text}</span></label></div>`
+      html += `<div class="checklist-item"><input type="checkbox"${checked}><span contenteditable>${text}</span></div>`
       continue
     }
 

@@ -19,19 +19,26 @@ function selectNote(id) {
   activeId = id
   const editorArea = document.getElementById('editor-area')
   const emptyState = document.getElementById('empty-state')
+  const fmtTools = document.getElementById('fmt-tools')
+  const btnDelete = document.getElementById('btn-delete')
 
   if (!id) {
     clearEditor()
     editorArea.style.display = 'none'
     emptyState.style.display = 'flex'
+    fmtTools.style.display = 'none'
+    btnDelete.style.display = 'none'
     return
   }
+
+  editorArea.style.display = 'flex'
+  emptyState.style.display = 'none'
+  fmtTools.style.display = 'contents'
+  btnDelete.style.display = ''
 
   const note = notes.find((n) => n.id === id)
   if (!note) return
 
-  editorArea.style.display = 'flex'
-  emptyState.style.display = 'none'
   loadNote(note)
   vessel.sections.setActive(id)
   vessel.storage.set('activeNoteId', id)
@@ -81,9 +88,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       syncSections()
       saveNotes()
     }, 500),
-    onBodyChange: debounce((md) => {
+    onBodyChange: debounce((html) => {
       if (!activeId) return
-      setContent(activeId, md)
+      setContent(activeId, html)
       saveNotes()
     }, 500)
   })

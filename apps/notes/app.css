@@ -97,15 +97,8 @@ body {
   margin: 2px 0;
 }
 
-.checklist-item label {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-  width: 100%;
-}
-
 .checklist-item input[type='checkbox'] {
+  cursor: pointer;
   margin-top: 3px;
   accent-color: var(--vs-accent);
   flex-shrink: 0;
