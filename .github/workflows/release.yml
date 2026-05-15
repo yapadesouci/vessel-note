@@ -19,4 +19,4 @@ jobs:
       - run: node scripts/pack.js
       - uses: softprops/action-gh-release@v2
         with:
-          files: dist/my-app-dist.zip
+          files: dist/vessel-note.zip
