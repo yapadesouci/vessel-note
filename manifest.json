@@ -1,10 +1,10 @@
 {
-  "id": "my-app-dist",
-  "name": "My App",
-  "version": "0.1.0",
+  "id": "vessel-note",
+  "name": "Notes",
+  "version": "1.0.0",
   "author": "",
-  "description": "",
+  "description": "A simple note-taking app",
   "apps": [
-    { "id": "my-app", "name": "My App", "permissions": [] }
+    { "id": "notes", "name": "Notes", "permissions": ["storage", "sections-reorder"] }
   ]
 }
