@@ -1,13 +1,13 @@
 ---
 name: cargo-creation
-description: Use when creating a new Vessel cargo — a zip-packaged static web app that runs sandboxed in the Vessel host with SDK access to storage, notifications, clipboard, and http
+description: Use when creating a new Vessel cargo — a zip-packaged static web app that runs sandboxed in the Vessel host with SDK access to storage, notifications, clipboard, and network
 ---
 
 # Vessel Cargo Creation
 
 ## Overview
 
-A Vessel **cargo** is a ZIP file containing one or more static web apps (`manifest.json` + `apps/` + bundled SDK). All apps in a cargo share a single `sdk/index.js`. Cargos run in sandboxed iframes inside the Vessel Electron host, communicating with native APIs via `@vessel-aircodr/sdk` through postMessage.
+A Vessel **cargo** is a ZIP file containing one or more static web apps (`manifest.json` + `apps/` + bundled SDK). All apps in a cargo share a single `sdk/index.js`. Cargos run in sandboxed iframes inside the Vessel Electron host, communicating with native APIs via the SDK through postMessage.
 
 ## File Structure
 
@@ -15,7 +15,7 @@ A Vessel **cargo** is a ZIP file containing one or more static web apps (`manife
 my-dist/
   manifest.json        ← required, must be at zip root
   sdk/
-    index.js           ← bundled @vessel-aircodr/sdk (shared by all apps)
+    index.js           ← SDK bundle (shared by all apps, committed in template)
   apps/
     {appId}/
       index.html       ← entry point for this app
@@ -31,9 +31,11 @@ my-dist/
   "version": "1.0.0",
   "author": "Your Name",
   "description": "What this cargo does",
+  "icon": "🎯",
+  "cdns": ["unpkg", "jsdelivr"],
   "apps": [
     { "id": "main",  "name": "Main App",  "permissions": ["storage"] },
-    { "id": "extra", "name": "Extra App", "permissions": ["http"] }
+    { "id": "extra", "name": "Extra App", "permissions": ["network"] }
   ]
 }
 ```
@@ -41,8 +43,11 @@ my-dist/
 | Field | Rule |
 |-------|------|
 | `id` | `/^[a-z0-9-]{1,64}$/` — lowercase alphanumeric + hyphens only |
+| `name` | Required non-empty string |
 | `version` | Valid semver — `1.0.0` not `v1.0.0` |
-| `apps` | Required non-empty array. Each entry: `{ id, name, permissions }`. Permissions are a subset of `["storage", "notifications", "clipboard", "http"]` — declare only what you use |
+| `author` | Required non-empty string |
+| `apps` | Required non-empty array. Each entry: `{ id, name, permissions }`. Permissions are a subset of `["storage", "notifications", "clipboard", "network"]` — declare only what you use |
+| `cdns` | Optional array of curated CDN keys. Allowed values: `"unpkg"`, `"jsdelivr"`, `"cdnjs"`. Enables loading scripts/styles from those CDNs via CSP. |
 | `icon` | Optional emoji or image URL |
 | `description` | Optional, shown in Marketplace |
 
@@ -70,32 +75,47 @@ my-dist/
 
 | API | Signature | Notes |
 |-----|-----------|-------|
-| `storage.get` | `(key: string) → unknown` | Per-app JSON store (`distId + appId`), 10 MB max |
-| `storage.set` | `(key: string, value: unknown) → void` | Throws `VesselStorageQuotaExceeded` at limit |
+| `storage.get` | `(key: string) → unknown \| null` | Per-app JSON store, 10 MB max |
+| `storage.set` | `(key: string, value: unknown) → void` | Persisted at `~/.vessel/storage/<distId>__<appId>.json` |
 | `notifications.send` | `({ title, body }) → void` | Requires `notifications` permission |
+| `notifications.schedule` | `({ items: ScheduledNotif[] }) → void` | Requires `notifications` permission. Replaces all scheduled notifications. `ScheduledNotif`: `{ id, title, body, fireAt }` where `fireAt` is a Unix ms timestamp. Max lookahead: 7 days. |
 | `clipboard.write` | `(text: string) → void` | Requires `clipboard` permission |
-| `http.fetch` | `(url: string, options?: HttpOptions) → HttpResponse` | Requires `http` permission. Direct `fetch()` is blocked — use this instead. `HttpOptions`: `{ method?, headers?, body? }`. `HttpResponse`: `{ status, headers, body, bodyEncoding: 'text'\|'base64' }` |
+| `http.fetch` | `(url: string, options?: HttpOptions) → HttpResponse` | Requires `network` permission. `HttpOptions`: `{ method?, headers?, body? }`. `HttpResponse`: `{ status, headers, body, bodyEncoding: 'text'\|'base64' }` |
 
 Calling an API without the matching permission throws `VesselPermissionDenied`.
 
 ## Packaging
 
+The template ships with `sdk/index.js` already committed — no npm install required.
+
 ```bash
-# Preferred: uses scripts/pack.js (copies SDK bundle automatically)
+# Using the included script
 node scripts/pack.js
 
-# Manual alternative — must zip from inside the directory
+# Or manually — must zip from inside the directory
 cd my-dist/
 zip -r ../my-dist.zip .
 ```
 
-`scripts/pack.js` copies `node_modules/@vessel-aircodr/sdk/dist/bundle.js` → `sdk/index.js` before zipping. Update the `outFile` variable to match your cargo ID.
+Update the `outFile` variable in `scripts/pack.js` to match your cargo ID.
 
 ## Security Constraints
 
-Cargos run in a sandboxed iframe with no direct network access:
-- ❌ `fetch('https://...')` is blocked — use `http.fetch()` instead
-- ❌ No loading scripts/styles from CDNs — bundle all assets locally
+Cargos run in a sandboxed iframe. The host enforces this CSP on every response:
+
+```
+default-src vessel:
+script-src vessel: 'unsafe-inline' [cdn-origins if declared]
+style-src vessel: 'unsafe-inline' [cdn-origins if declared]
+img-src vessel: data: [cdn-origins if declared]
+connect-src vessel:
+```
+
+**What this means for cargo authors:**
+- ❌ Direct `fetch('https://...')` is blocked — use `http.fetch()` instead
+- ✅ `http.fetch(url, options?)` makes external HTTPS calls via the host — requires `network` permission
+- ✅ Loading scripts/styles from `unpkg`, `jsdelivr`, or `cdnjs` is allowed if declared in `cdns`
+- ❌ Loading CDN fonts is not supported even with `cdns` declared
 - ✅ Inline `<style>` and `<script>` blocks work
 - ✅ `data:` URIs for images work
 - ✅ ES module imports from relative paths work
@@ -107,11 +127,13 @@ Cargos run in a sandboxed iframe with no direct network access:
 | Calling any API before `await ready()` | Move all API calls after `await ready()` |
 | `"version": "v1.0.0"` | Remove the `v` — must be bare semver |
 | `"id": "My Cargo"` | Use `my-cargo` — lowercase, hyphens only |
-| `fetch('https://...')` directly | Use `http.fetch(...)` and add `"http"` to permissions |
+| `fetch('https://...')` directly | Use `http.fetch(...)` and add `"network"` to permissions |
+| Loading a CDN script without declaring it | Add the CDN key to `"cdns"`. Allowed: `"unpkg"`, `"jsdelivr"`, `"cdnjs"`. |
+| Loading CDN fonts | Not supported — bundle fonts locally |
 | Zipping the folder itself | `cd my-dist && zip -r ../x.zip .` not `zip -r x.zip my-dist/` |
 | Top-level `await` outside a module | Add `type="module"` to your `<script>` tag |
 | Importing SDK as `./sdk/index.js` from inside an app | Use `../../sdk/index.js` — apps live two levels deep |
 | Putting `index.html` at the zip root | Place it in `apps/{appId}/index.html` |
 | Top-level `"permissions"` in manifest | Permissions belong in each app entry, not at the cargo level |
 | Single app with no `apps` array | Always use `"apps": [...]` — even single-app cargos require the array |
-| Forgetting to run `pack.js` after editing SDK copy | `node scripts/pack.js` re-copies the SDK bundle on every build |
+| Missing `author` field | `author` is required — add a non-empty string |

@@ -23,11 +23,10 @@ Minimal starter template for a [Vessel](https://vessel.app) cargo — a sandboxe
 Requires Node.js 18+.
 
 ```bash
-npm install
-npm run build
+node scripts/pack.js
 ```
 
-Produces `dist/<cargo-id>.zip`.
+Produces `dist/<cargo-id>.zip`. No `npm install` needed — the SDK bundle is included in this repo at `sdk/index.js`.
 
 ## Install
 
