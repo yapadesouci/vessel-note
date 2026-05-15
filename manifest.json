@@ -1,7 +1,7 @@
 {
   "id": "vessel-note",
   "name": "Notes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "vessel-note",
   "description": "A simple note-taking app",
   "apps": [
