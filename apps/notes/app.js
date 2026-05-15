@@ -38,6 +38,22 @@ function selectNote(id) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Register button handlers first so they always work, even if async init fails
+  document.getElementById('btn-new').addEventListener('click', () => {
+    const note = createNote()
+    syncSections()
+    saveNotes()
+    selectNote(note.id)
+  })
+
+  document.getElementById('btn-delete').addEventListener('click', () => {
+    if (!activeId) return
+    const nextId = deleteNote(activeId)
+    syncSections()
+    saveNotes()
+    selectNote(nextId)
+  })
+
   await vessel.ready()
 
   await loadNotes()
@@ -50,11 +66,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   vessel.sections.onSelect((id) => selectNote(id))
 
-  vessel.sections.onReorder((ids) => {
-    reorderNotes(ids)
-    syncSections()
-    saveNotes()
-  })
+  if (typeof vessel.sections.onReorder === 'function') {
+    vessel.sections.onReorder((ids) => {
+      reorderNotes(ids)
+      syncSections()
+      saveNotes()
+    })
+  }
 
   initEditor({
     onTitleChange: debounce((title) => {
@@ -71,19 +89,4 @@ document.addEventListener('DOMContentLoaded', async () => {
   })
 
   selectNote(restoredId)
-
-  document.getElementById('btn-new').addEventListener('click', () => {
-    const note = createNote()
-    syncSections()
-    saveNotes()
-    selectNote(note.id)
-  })
-
-  document.getElementById('btn-delete').addEventListener('click', () => {
-    if (!activeId) return
-    const nextId = deleteNote(activeId)
-    syncSections()
-    saveNotes()
-    selectNote(nextId)
-  })
 })
