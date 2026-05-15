@@ -16,16 +16,17 @@ function nodeToMd(node) {
   if (tag === 'u') return `<u>${inner()}</u>`
   if (tag === 'br') return '\n'
   if (tag === 'ul') {
-    return Array.from(el.querySelectorAll(':scope > li')).map(li => `- ${li.textContent?.trim() ?? ''}`).join('\n') + '\n'
+    return Array.from(el.querySelectorAll(':scope > li')).map(li => `- ${Array.from(li.childNodes).map(nodeToMd).join('').trim()}`).join('\n') + '\n'
   }
   if (tag === 'ol') {
-    return Array.from(el.querySelectorAll(':scope > li')).map((li, i) => `${i + 1}. ${li.textContent?.trim() ?? ''}`).join('\n') + '\n'
+    return Array.from(el.querySelectorAll(':scope > li')).map((li, i) => `${i + 1}. ${Array.from(li.childNodes).map(nodeToMd).join('').trim()}`).join('\n') + '\n'
   }
   if (tag === 'div' && el.classList.contains('checklist-item')) {
     const cb = el.querySelector('input[type="checkbox"]')
     const span = el.querySelector('span')
     const checked = cb?.checked ? 'x' : ' '
-    return `- [${checked}] ${span?.textContent?.trim() ?? ''}\n`
+    const text = span ? Array.from(span.childNodes).map(nodeToMd).join('').trim() : ''
+    return `- [${checked}] ${text}\n`
   }
   if (tag === 'div' || tag === 'p') return inner() + '\n'
   return inner()
@@ -40,9 +41,7 @@ export function mdToHtml(md) {
     if (listType) { html += listType === 'ul' ? '</ul>' : '</ol>'; listType = null }
   }
 
-  for (const raw of lines) {
-    const line = raw
-
+  for (const line of lines) {
     // Checklist
     const clDone = line.match(/^- \[x\] (.*)$/i)
     const clTodo = line.match(/^- \[ \] (.*)$/)
@@ -83,10 +82,17 @@ export function mdToHtml(md) {
   return html
 }
 
-function applyInline(text) {
-  // Order matters: bold before italic to avoid partial matches
+function escapeHtml(text) {
   return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+function applyInline(text) {
+  return escapeHtml(text)
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/_(.+?)_/g, '<em>$1</em>')
-  // <u> passthrough — already HTML, no transformation needed
+    .replace(/&lt;u&gt;(.+?)&lt;\/u&gt;/g, '<u>$1</u>')
 }
