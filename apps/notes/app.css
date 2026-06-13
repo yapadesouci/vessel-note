@@ -1,112 +1,170 @@
-body {
-  margin: 0;
-  overflow: hidden;
-}
+/* Notes — cargo stylesheet.
+   Layout owned by this cargo's author. Inherits all tokens &
+   components from vessel://sdk.css (linked first in index.html).
+   The cargo renders only the editor pane; the note list is host chrome. */
 
-#app {
+/* ════════════════════ SHELL ════════════════════ */
+.cargo,
+.app,
+.nt-main {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: var(--vs-bg);
-}
-
-#toolbar {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  height: 40px;
-  padding: 0 10px;
-  flex-shrink: 0;
-  background: var(--vs-bg-soft);
-  border-bottom: 1px solid var(--vs-border);
-}
-
-.toolbar-sep {
-  width: 1px;
-  height: 16px;
-  background: var(--vs-border-strong);
-  flex-shrink: 0;
-}
-
-.toolbar-spacer {
-  flex: 1;
-}
-
-#editor-area {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 20px 24px;
-  gap: 8px;
-  overflow: hidden;
   min-height: 0;
 }
+.cargo,
+.app {
+  flex: 1;
+}
+.nt-main {
+  flex: 1;
+  min-width: 0;
+}
 
-#note-title {
+/* ════════════════════ TOOLBAR ════════════════════ */
+.nt-bar {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: var(--topbar-h);
+  padding: 0 14px;
+  border-bottom: 1px solid var(--vs-border);
+  background: var(--vs-bg-chrome);
+  flex-shrink: 0;
+}
+.nt-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--vs-border-strong);
+  margin: 0 6px;
+}
+.fmt-btn.is-active {
+  color: var(--vs-accent);
+  background: var(--vs-accent-soft);
+  border-color: var(--vs-accent-line);
+}
+
+/* ════════════════════ EDITOR ════════════════════ */
+.nt-edit {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 28px 48px 0;
+}
+.nt-title-input {
+  width: 100%;
   background: transparent;
   border: none;
-  border-radius: 0;
-  font-size: 18px;
-  font-weight: 600;
-  padding: 0;
+  outline: none;
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--vs-text);
-  outline: none;
-  width: 100%;
+  padding: 0;
+  margin: 0 0 16px;
+  flex-shrink: 0;
 }
-
-#note-title:focus {
-  border: none;
-  box-shadow: none;
+.nt-title-input::placeholder {
+  color: var(--vs-text-dim);
 }
-
-#note-title::placeholder {
-  color: var(--vs-text-faint);
-}
-
-#note-body {
+.nt-body {
   flex: 1;
-  outline: none;
   overflow-y: auto;
-  font-size: 14px;
-  line-height: 1.7;
+  outline: none;
+  padding-bottom: 48px;
+  font-size: 14.5px;
+  line-height: 1.78;
   color: var(--vs-text-muted);
-  min-height: 0;
+  max-width: 70ch;
 }
-
-#note-body:empty::before {
+.nt-body:empty::before {
   content: 'Start writing…';
-  color: var(--vs-text-faint);
-  pointer-events: none;
+  color: var(--vs-text-dim);
+}
+.nt-body div {
+  margin: 0 0 4px;
+}
+.nt-body strong {
+  color: var(--vs-text);
+  font-weight: 700;
+}
+.nt-body em {
+  font-style: italic;
+}
+.nt-body ul,
+.nt-body ol {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+.nt-body li {
+  margin: 3px 0;
 }
 
-#empty-state {
-  display: none;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--vs-text-faint);
-  font-size: 14px;
-  text-align: center;
-  padding: 40px;
-}
-
+/* Checklist items (created by editor.js) */
 .checklist-item {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin: 2px 0;
+  gap: 10px;
+  margin: 5px 0;
 }
-
 .checklist-item input[type='checkbox'] {
-  cursor: pointer;
-  margin-top: 3px;
-  accent-color: var(--vs-accent);
+  appearance: none;
+  width: 17px;
+  height: 17px;
+  margin: 3px 0 0;
+  border-radius: var(--r-xs);
+  border: 1px solid var(--vs-border-strong);
+  background: var(--vs-bg-input);
   flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
 }
-
+.checklist-item input[type='checkbox']:checked {
+  background: var(--vs-accent);
+  border-color: var(--vs-accent);
+}
+.checklist-item input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 9px;
+  border: solid var(--vs-accent-contrast);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 .checklist-item span {
   flex: 1;
   outline: none;
-  min-width: 0;
+}
+.checklist-item input[type='checkbox']:checked + span {
+  text-decoration: line-through;
+  color: var(--vs-text-faint);
+}
+
+/* ════════════════════ EMPTY STATE ════════════════════ */
+.nt-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--vs-text-faint);
+}
+.nt-empty-icon {
+  width: 34px;
+  height: 34px;
+  color: var(--vs-text-dim);
+}
+.nt-empty-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--vs-text-muted);
+}
+.nt-empty-sub {
+  font-size: 13px;
 }

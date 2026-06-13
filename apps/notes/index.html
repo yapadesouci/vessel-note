@@ -1,37 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Notes</title>
-  <link rel="stylesheet" href="vessel://sdk.css" />
-  <link rel="stylesheet" href="app.css" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Notes · a Vessel cargo</title>
+<!--
+  NOTES — a Vessel cargo (author: s. abib)
+  The cargo owns the editor surface only; the note list is rendered by the
+  host from vessel.sections. Unity via vessel://sdk.css; layout is ours.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="vessel://sdk.css" />
+<link rel="stylesheet" href="app.css" />
 </head>
 <body>
-  <div id="app">
-    <div id="toolbar">
-      <button class="vs-btn vs-btn-soft vs-btn-sm" id="btn-new">+ New</button>
-      <div id="fmt-tools" style="display:contents">
-        <div class="toolbar-sep"></div>
-        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="bold"><b>B</b></button>
-        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="italic"><i>I</i></button>
-        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="underline"><u>U</u></button>
-        <div class="toolbar-sep"></div>
-        <button class="vs-btn vs-btn-ghost vs-btn-sm fmt-btn" data-cmd="insertUnorderedList">≡</button>
-        <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-checklist">☑</button>
+<div class="cargo">
+  <div class="app">
+    <div class="nt-main">
+      <div class="nt-bar">
+        <span id="fmt-tools" style="display: contents">
+          <button class="dd-icon-btn fmt-btn" data-cmd="bold" title="Bold"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-bold"/></svg></button>
+          <button class="dd-icon-btn fmt-btn" data-cmd="italic" title="Italic"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-italic"/></svg></button>
+          <button class="dd-icon-btn fmt-btn" data-cmd="underline" title="Underline"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-underline"/></svg></button>
+          <span class="nt-sep"></span>
+          <button class="dd-icon-btn" id="btn-checklist" title="Checklist"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-checklist"/></svg></button>
+        </span>
+        <div class="spacer" style="flex: 1"></div>
+        <button class="dd-btn dd-btn-soft dd-btn-sm" id="btn-new"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-plus"/></svg> New</button>
+        <button class="dd-icon-btn" id="btn-delete" title="Delete note"><svg class="vi" viewBox="0 0 24 24"><use href="#vi-trash"/></svg></button>
       </div>
-      <div class="toolbar-spacer"></div>
-      <button class="vs-btn vs-btn-ghost vs-btn-sm" id="btn-delete" style="display:none">🗑</button>
-    </div>
-    <div id="editor-area">
-      <input id="note-title" class="vs-input" placeholder="Note title" autocomplete="off" />
-      <div id="note-body" contenteditable="true" spellcheck="true"></div>
-    </div>
-    <div id="empty-state">
-      No notes yet.<br>Click <b>+ New</b> to create one.
+
+      <div id="editor-area" class="nt-edit" style="display: none">
+        <input id="note-title" class="nt-title-input" placeholder="Untitled" />
+        <div id="note-body" class="nt-body" contenteditable="true" spellcheck="false"></div>
+      </div>
+
+      <div id="empty-state" class="nt-empty">
+        <svg class="vi nt-empty-icon" viewBox="0 0 24 24"><use href="#vi-note"/></svg>
+        <div class="nt-empty-title">No note selected</div>
+        <div class="nt-empty-sub">Press <span class="dd-kbd">New</span> to start writing.</div>
+      </div>
     </div>
   </div>
-  <script src="vessel://sdk.js"></script>
-  <script type="module" src="app.js"></script>
+</div>
+<script src="vessel://sdk-icons.js"></script>
+<script src="vessel://sdk.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
