@@ -1,7 +1,7 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
-  "description": "A Vessel cargo",
+  "name": "note",
+  "version": "1.1.0",
+  "description": "A Vessel cargo - note app",
   "type": "module",
   "private": true,
   "scripts": {
